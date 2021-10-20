@@ -36,6 +36,7 @@ class QLabel;
 class QPushButton;
 class QMdiSubWindow;
 
+class CaptionMenu;
 class LedCheckBox;
 
 
@@ -59,9 +60,6 @@ public:
 
 public slots:
 	void editControls();
-	void moveUp();
-	void moveDown();
-	void deleteController();
 	void closeControls();
 	void renameController();
 
@@ -80,6 +78,7 @@ protected:
 private:
 	QMdiSubWindow * m_subWindow;
 	ControllerDialog * m_controllerDlg;
+	CaptionMenu* m_contextMenu;
 	QLabel * m_nameLabel;
 	bool m_show;
 

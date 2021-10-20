@@ -645,6 +645,14 @@ PianoView {
 	background-color: #14171a;
 }
 
+ControllerView {
+    border: 1px solid black;
+}
+
+ControllerView:focus {
+    background: #3b424a;
+}
+
 /* font sizes for text buttons */
 
 FxMixerView QPushButton, EffectRackView QPushButton, ControllerRackView QPushButton {

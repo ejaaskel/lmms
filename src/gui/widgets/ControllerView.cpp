@@ -23,7 +23,7 @@
  *
  */
 
-
+#include <QContextMenuEvent>
 #include <QLabel>
 #include <QPushButton>
 #include <QMdiArea>
@@ -51,8 +51,6 @@ ControllerView::ControllerView( Controller * _model, QWidget * _parent ) :
 	m_controllerDlg( nullptr ),
 	m_show( true )
 {
-	this->setFrameStyle( QFrame::StyledPanel );
-	this->setFrameShadow( QFrame::Raised );
 	this->setFocusPolicy( Qt::StrongFocus );
 
 	QVBoxLayout *vBoxLayout = new QVBoxLayout(this);
@@ -75,6 +73,33 @@ ControllerView::ControllerView( Controller * _model, QWidget * _parent ) :
 	m_nameLabel = new QLabel(_model->name(), this);
 	vBoxLayout->addWidget(m_nameLabel);
 
+	// Context menu
+	Controller* c = castModel<Controller>();
+	m_contextMenu = new CaptionMenu(c->name(), this);
+
+	QAction* moveUpAction = new QAction(embed::getIconPixmap("arp_up"), tr("Move &up"), this);
+	moveUpAction->setShortcut(Qt::Key_Up | Qt::AltModifier);
+	moveUpAction->setShortcutContext(Qt::WidgetShortcut);
+	connect(moveUpAction, &QAction::triggered, this, [this]{ emit moveUp(this); } );
+	m_contextMenu->addAction(moveUpAction);
+	addAction(moveUpAction);
+
+	QAction* moveDownAction = new QAction(embed::getIconPixmap("arp_down"), tr("Move &down"), this);
+	moveDownAction->setShortcut(Qt::Key_Down | Qt::AltModifier);
+	moveDownAction->setShortcutContext(Qt::WidgetShortcut);
+	connect(moveDownAction, &QAction::triggered, this, [this]{ emit moveDown(this); } );
+	m_contextMenu->addAction(moveDownAction);
+	addAction(moveDownAction);
+
+	m_contextMenu->addSeparator();
+
+	QAction* deleteAction = new QAction(embed::getIconPixmap("cancel"), tr("&Remove this controller"), this);
+	deleteAction->setShortcut(Qt::Key_Delete);
+	connect(deleteAction, &QAction::triggered, this, [this]{ emit deleteController(this); } );
+	m_contextMenu->addAction(deleteAction);
+	addAction(deleteAction);
+
+	m_contextMenu->addAction(tr("Re&name this controller"), this, SLOT(renameController()));
 
 	m_controllerDlg = getController()->createDialog( getGUI()->mainWindow()->workspace() );
 
@@ -133,20 +158,7 @@ void ControllerView::closeControls()
 	m_show = true;
 }
 
-void ControllerView::moveUp()
-{
-	emit moveUp( this );
-}
 
-void ControllerView::moveDown()
-{
-	emit moveDown( this );
-}
-
-void ControllerView::deleteController()
-{
-	emit( deleteController( this ) );
-}
 
 void ControllerView::renameController()
 {
@@ -181,22 +193,7 @@ void ControllerView::modelChanged()
 
 
 
-void ControllerView::contextMenuEvent( QContextMenuEvent * )
+void ControllerView::contextMenuEvent(QContextMenuEvent* event)
 {
-	Controller * c = castModel<Controller>();
-	QPointer<CaptionMenu> contextMenu = new CaptionMenu( c->name(), this );
-	contextMenu->addAction( embed::getIconPixmap( "arp_up" ),
-						tr( "Move &up" ),
-						this, SLOT( moveUp() ) );
-	contextMenu->addAction( embed::getIconPixmap( "arp_down" ),
-						tr( "Move &down" ),
-						this, SLOT( moveDown() ) );
-	contextMenu->addSeparator();
-	contextMenu->addAction( embed::getIconPixmap( "cancel" ),
-						tr( "&Remove this controller" ),
-						this, SLOT( deleteController() ) );
-	contextMenu->addAction( tr("Re&name this controller"), this, SLOT( renameController() ));
-	contextMenu->addSeparator();
-	contextMenu->exec( QCursor::pos() );
-	delete contextMenu;
+	m_contextMenu->popup(mapToGlobal(event->pos()));
 }

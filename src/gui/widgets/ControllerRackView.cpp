@@ -187,18 +187,6 @@ void ControllerRackView::onControllerAdded( Controller * controller )
 	connect( controllerView, SIGNAL( deleteController( ControllerView * ) ),
 		 this, SLOT( deleteController( ControllerView * ) ), Qt::QueuedConnection );
 
-	QAction* moveUpAction = new QAction( controllerView );
-	moveUpAction->setShortcut( Qt::Key_Up | Qt::AltModifier );
-	moveUpAction->setShortcutContext( Qt::WidgetShortcut );
-	connect( moveUpAction, SIGNAL( triggered() ), controllerView, SLOT( moveUp( ) ) );
-	controllerView->addAction( moveUpAction );
-
-	QAction* moveDownAction = new QAction( controllerView );
-	moveDownAction->setShortcut( Qt::Key_Down | Qt::AltModifier );
-	moveDownAction->setShortcutContext( Qt::WidgetShortcut );
-	connect( moveDownAction, SIGNAL( triggered() ), controllerView, SLOT( moveDown( ) ) );
-	controllerView->addAction( moveDownAction );
-
 	m_controllerViews.append( controllerView );
 	m_scrollAreaLayout->insertWidget( m_nextIndex, controllerView );
 
